@@ -691,9 +691,28 @@ document.getElementById('healthForm').addEventListener('submit', function(event)
   };
 
   const records = getHealthRecords();
-  records.push(record);
 
-  localStorage.setItem(healthKey, JSON.stringify(records));
+if (editingRecordId) {
+  const index = records.findIndex(
+    item => item.id === editingRecordId
+  );
+
+  if (index !== -1) {
+    records[index] = {
+      ...record,
+      id: editingRecordId
+    };
+  }
+} else {
+  records.push(record);
+}
+
+localStorage.setItem(healthKey, JSON.stringify(records));
+
+editingRecordId = null;
+
+document.querySelector('#healthForm button[type="submit"]')
+  .textContent = '+ Save health record';
 
   this.reset();
   setDefaultDateTime();
