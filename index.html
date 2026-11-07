@@ -625,6 +625,31 @@ function displayHealthRecords() {
       ' | Pain location: ' + (record.painLocation || 'Not entered') +
       ' | Notes: ' + (record.notes || 'None');
 
+    
+const editButton = document.createElement('button');
+editButton.type = 'button';
+editButton.className = 'btn';
+editButton.textContent = '✏️ Edit record';
+editButton.style.marginRight = '8px';
+
+editButton.addEventListener('click', function() {
+  editingRecordId = record.id;
+
+  document.getElementById('recordDate').value = record.date;
+  document.getElementById('recordTime').value = record.time;
+  document.getElementById('heartRate').value = record.heartRate;
+  document.getElementById('symptoms').value = record.symptoms;
+  document.getElementById('painLocation').value = record.painLocation;
+  document.getElementById('notes').value = record.notes;
+
+  document.querySelector('#healthForm button[type="submit"]')
+    .textContent = 'Update health record';
+
+  document.getElementById('healthForm').scrollIntoView({
+    behavior: 'smooth'
+  });
+});
+
     const deleteButton = document.createElement('button');
     deleteButton.type = 'button';
     deleteButton.className = 'btn';
