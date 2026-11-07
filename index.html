@@ -686,10 +686,47 @@ h1 {
   </button>
 </section>
 
-<section class="page" id="lifestyle">
-  <h1>Smoking & drinking</h1>
-  <p class="subtitle">Optional lifestyle records.</p>
-  <div class="card"><p class="empty">Lifestyle tracking will be added later.</p></div>
+<<section class="page" id="lifestyle">
+  <h1>Smoking & Drinking</h1>
+  <p class="subtitle">Optional, private lifestyle records.</p>
+
+  <div class="card section-card">
+    <h3>Add a lifestyle record</h3>
+
+    <label>Record type</label>
+    <select id="lifestyleType">
+      <option value="Smoking">Smoking</option>
+      <option value="Drinking">Alcohol consumption</option>
+    </select>
+
+    <br><br>
+    <label>Quantity (optional)</label>
+    <input type="text" id="lifestyleQuantity"
+      placeholder="Optional details">
+
+    <br><br>
+    <label>Additional notes</label>
+    <textarea id="lifestyleNotes"
+      placeholder="Optional notes..."
+      rows="3"></textarea>
+
+    <br><br>
+    <button class="btn" type="button" id="saveLifestyle">
+      + Save record
+    </button>
+
+    <p id="lifestyleMessage"></p>
+  </div>
+
+  <div class="card section-card">
+    <h3>Smoking History</h3>
+    <div id="smokingHistory">No records yet.</div>
+  </div>
+
+  <div class="card section-card">
+    <h3>Drinking History</h3>
+    <div id="drinkingHistory">No records yet.</div>
+  </div>
 </section>
 
 <section class="page" id="water">
