@@ -2543,7 +2543,9 @@ document.getElementById('settingsLogout').addEventListener('click', async () => 
   }
 });
 
+
 loadSettingsAccount();
+
 async function loadProfile() {
   const { data: { user } } = await supabaseClient.auth.getUser();
   if (!user) return;
@@ -2579,12 +2581,6 @@ async function loadProfile() {
   } else {
     photo.style.display = 'none';
   }
-}
-
-
-
-  document.getElementById('profileDisplayName').value =
-    data?.display_name || 'Likkamma';
 }
 
 document.getElementById('saveProfile').addEventListener('click', async () => {
@@ -2652,7 +2648,7 @@ document.getElementById('saveProfile').addEventListener('click', async () => {
       updated_at: new Date().toISOString()
     });
 
-    if (error) {
+  if (error) {
     message.textContent = 'Could not save profile: ' + error.message;
     return;
   }
@@ -2679,6 +2675,9 @@ document.getElementById('saveProfile').addEventListener('click', async () => {
 });
 
 loadProfile();
+
+
+  
 
 
 </script>
