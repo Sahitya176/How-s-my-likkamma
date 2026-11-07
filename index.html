@@ -2325,6 +2325,116 @@ document.getElementById('saveWellbeing').addEventListener('click', async () => {
 loadWellbeingRecords();
 
 
+function setDefaultReportMonth() {
+  const now = new Date();
+  document.getElementById('reportMonth').value =
+    `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+}
+
+document.getElementById('generateReport').addEventListener('click', async () => {
+  const month = document.getElementById('reportMonth').value;
+  const message = document.getElementById('reportMessage');
+
+  if (!month) {
+    message.textContent = 'Please select a month.';
+    return;
+  }
+
+  const { data: { user } } = await supabaseClient.auth.getUser();
+
+  if (!user) {
+    message.textContent = 'Please log in first.';
+    return;
+  }
+
+  message.textContent = 'Generating report...';
+
+  const startDate = `${month}-01`;
+  const [year, monthNumber] = month.split('-').map(Number);
+  const nextMonth = new Date(year, monthNumber, 1);
+  const endDate = `${nextMonth.getFullYear()}-${String(nextMonth.getMonth() + 1).padStart(2, '0')}-01`;
+
+  const [medical, food, water, lifestyle] = await Promise.all([
+    supabaseClient.from('health_records')
+      .select('*')
+      .eq('owner_id', user.id)
+      .gte('record_date', startDate)
+      .lt('record_date', endDate),
+
+    supabaseClient.from('food_entries')
+      .select('*')
+      .eq('owner_id', user.id)
+      .gte('meal_date', startDate)
+      .lt('meal_date', endDate),
+
+    supabaseClient.from('water_entries')
+      .select('*')
+      .eq('owner_id', user.id)
+      .gte('created_at', `${startDate}T00:00:00`)
+      .lt('created_at', `${endDate}T00:00:00`),
+
+    supabaseClient.from('lifestyle_awareness')
+      .select('*')
+      .eq('owner_id', user.id)
+      .gte('created_at', `${startDate}T00:00:00`)
+      .lt('created_at', `${endDate}T00:00:00`)
+  ]);
+
+  const results = [medical, food, water, lifestyle];
+
+  if (results.some(result => result.error)) {
+    message.textContent = 'Could not generate report. Please try again.';
+    return;
+  }
+
+  const medicalData = medical.data || [];
+  const foodData = food.data || [];
+  const waterData = water.data || [];
+  const lifestyleData = lifestyle.data || [];
+
+  const heartRates = medicalData
+    .map(record => record.heart_rate)
+    .filter(value => value !== null && value !== undefined);
+
+  const averageHeartRate = heartRates.length
+    ? Math.round(heartRates.reduce((a, b) => a + b, 0) / heartRates.length)
+    : 'No data';
+
+  document.getElementById('reportMedical').textContent =
+    `Total medical records: ${medicalData.length} | Average recorded heart rate: ${averageHeartRate} | Records with symptom notes: ${medicalData.filter(r => r.symptoms).length}`;
+
+  const mealTypes = ['Breakfast', 'Lunch', 'Dinner', 'Snacks', 'Drinks'];
+
+  document.getElementById('reportFood').textContent =
+    `Total meals: ${foodData.length} | ` +
+    mealTypes.map(type =>
+      `${type}: ${foodData.filter(r => r.meal_type === type).length}`
+    ).join(' | ');
+
+  const totalWater = waterData.reduce(
+    (sum, entry) => sum + (Number(entry.amount_ml) || 0), 0
+  );
+
+  document.getElementById('reportWater').textContent =
+    `Water entries: ${waterData.length} | Total recorded water: ${totalWater.toLocaleString()} ml`;
+
+  const smokingCount = lifestyleData.filter(
+    r => r.record_type === 'Smoking'
+  ).length;
+
+  const drinkingCount = lifestyleData.filter(
+    r => r.record_type === 'Drinking'
+  ).length;
+
+  document.getElementById('reportLifestyle').textContent =
+    `Smoking awareness records: ${smokingCount} | Alcohol awareness records: ${drinkingCount}`;
+
+  message.textContent = `Report generated for ${month}.`;
+});
+
+setDefaultReportMonth();
+
+
 </script>
 </body>
 </html>
