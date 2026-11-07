@@ -2143,6 +2143,153 @@ document.getElementById('saveWater')
   });
 
 loadWaterEntries();
+
+
+let editingWellbeingId = null;
+
+async function loadWellbeingRecords() {
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if (!user) return;
+
+  const history = document.getElementById('wellbeingHistory');
+
+  const { data, error } = await supabaseClient
+    .from('wellbeing_entries')
+    .select('*')
+    .eq('owner_id', user.id)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    history.textContent = 'Could not load records.';
+    return;
+  }
+
+  history.innerHTML = '';
+
+  if (!data || data.length === 0) {
+    history.textContent = 'No records yet.';
+    return;
+  }
+
+  data.forEach(record => {
+    const item = document.createElement('div');
+    item.className = 'history-item';
+
+    const details = document.createElement('p');
+    details.textContent =
+      `eskunnama? ${record.eskunnama} | Duration: ${record.duration || '-'} | Rating: ${record.rating ? '⭐'.repeat(record.rating) : '-'}`;
+
+    const notes = document.createElement('p');
+    notes.textContent = record.additional_notes || '';
+
+    const date = document.createElement('small');
+    date.textContent = new Date(record.created_at).toLocaleString();
+
+    const edit = document.createElement('button');
+    edit.textContent = 'Edit';
+    edit.type = 'button';
+    edit.onclick = () => {
+      editingWellbeingId = record.id;
+
+      document.querySelector(
+        `input[name="wellbeingDone"][value="${record.eskunnama}"]`
+      ).checked = true;
+
+      document.getElementById('wellbeingDuration').value =
+        record.duration || '';
+
+      document.getElementById('wellbeingRating').value =
+        record.rating || '';
+
+      document.getElementById('wellbeingNotes').value =
+        record.additional_notes || '';
+
+      document.getElementById('saveWellbeing').textContent = 'Update';
+    };
+
+    const remove = document.createElement('button');
+    remove.textContent = 'Delete';
+    remove.type = 'button';
+    remove.onclick = async () => {
+      if (!confirm('Delete this record?')) return;
+
+      const { error } = await supabaseClient
+        .from('wellbeing_entries')
+        .delete()
+        .eq('id', record.id)
+        .eq('owner_id', user.id);
+
+      if (error) {
+        alert('Could not delete record.');
+        return;
+      }
+
+      loadWellbeingRecords();
+    };
+
+    item.append(details, notes, date, edit, remove);
+    history.appendChild(item);
+  });
+}
+
+document.getElementById('saveWellbeing').addEventListener('click', async () => {
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if (!user) return;
+
+  const selected = document.querySelector(
+    'input[name="wellbeingDone"]:checked'
+  );
+
+  const rating = document.getElementById('wellbeingRating').value;
+
+  if (!selected || !rating) {
+    alert('Please select eskunnama? and Rating.');
+    return;
+  }
+
+  const record = {
+    owner_id: user.id,
+    eskunnama: selected.value,
+    duration: document.getElementById('wellbeingDuration').value.trim(),
+    rating: Number(rating),
+    additional_notes: document.getElementById('wellbeingNotes').value.trim()
+  };
+
+  let result;
+
+  if (editingWellbeingId) {
+    result = await supabaseClient
+      .from('wellbeing_entries')
+      .update(record)
+      .eq('id', editingWellbeingId)
+      .eq('owner_id', user.id);
+  } else {
+    result = await supabaseClient
+      .from('wellbeing_entries')
+      .insert(record);
+  }
+
+  if (result.error) {
+    alert('Could not save record: ' + result.error.message);
+    return;
+  }
+
+  editingWellbeingId = null;
+  document.querySelectorAll('input[name="wellbeingDone"]')
+    .forEach(input => input.checked = false);
+
+  document.getElementById('wellbeingDuration').value = '';
+  document.getElementById('wellbeingRating').value = '';
+  document.getElementById('wellbeingNotes').value = '';
+  document.getElementById('saveWellbeing').textContent = '+ Save';
+
+  document.getElementById('wellbeingMessage').textContent = 'Saved successfully!';
+  loadWellbeingRecords();
+});
+
+loadWellbeingRecords();
+
+
 </script>
 </body>
 </html>
