@@ -846,6 +846,117 @@ document.querySelector('#healthForm button[type="submit"]')
 
 setDefaultDateTime();
 displayHealthRecords();
+
+// AUTHENTICATION
+
+const authScreen = document.getElementById('authScreen');
+const appElement = document.querySelector('.app');
+const authMessage = document.getElementById('authMessage');
+
+function showLogin() {
+  document.getElementById('loginForm').style.display = 'block';
+  document.getElementById('signupForm').style.display = 'none';
+  authMessage.textContent = '';
+}
+
+function showSignup() {
+  document.getElementById('loginForm').style.display = 'none';
+  document.getElementById('signupForm').style.display = 'block';
+  authMessage.textContent = '';
+}
+
+function showApp() {
+  authScreen.style.display = 'none';
+  appElement.style.display = '';
+}
+
+function showAuth() {
+  appElement.style.display = 'none';
+  authScreen.style.display = 'flex';
+}
+
+// SIGN UP
+document.getElementById('signupButton').addEventListener('click', async function() {
+  const email = document.getElementById('signupEmail').value.trim();
+  const password = document.getElementById('signupPassword').value;
+
+  if (!email || !password) {
+    authMessage.textContent = 'Please enter your email and password.';
+    return;
+  }
+
+  if (password.length < 8) {
+    authMessage.textContent = 'Password must contain at least 8 characters.';
+    return;
+  }
+
+  authMessage.textContent = 'Creating your account...';
+
+  const { data, error } = await supabaseClient.auth.signUp({
+    email: email,
+    password: password
+  });
+
+  if (error) {
+    authMessage.textContent = error.message;
+    return;
+  }
+
+  if (data.session) {
+    showApp();
+  } else {
+    authMessage.textContent =
+      'Account created! Please check your email to confirm your account, then log in.';
+    showLogin();
+  }
+});
+
+// LOGIN
+document.getElementById('loginButton').addEventListener('click', async function() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+
+  if (!email || !password) {
+    authMessage.textContent = 'Please enter your email and password.';
+    return;
+  }
+
+  authMessage.textContent = 'Logging in...';
+
+  const { error } = await supabaseClient.auth.signInWithPassword({
+    email: email,
+    password: password
+  });
+
+  if (error) {
+    authMessage.textContent = error.message;
+  }
+});
+
+// RESTORE LOGIN SESSION
+showAuth();
+
+supabaseClient.auth.onAuthStateChange((_event, session) => {
+  if (session) {
+    showApp();
+  } else {
+    showAuth();
+  }
+});
+
+supabaseClient.auth.getSession().then(({ data, error }) => {
+  if (error) {
+    authMessage.textContent = error.message;
+    return;
+  }
+
+  if (data.session) {
+    showApp();
+  } else {
+    showAuth();
+  }
+});
+
 </script>
 </body>
 </html>
