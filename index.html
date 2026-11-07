@@ -2463,6 +2463,61 @@ document.getElementById('generateReport').addEventListener('click', async () => 
 setDefaultReportMonth();
 
 
+async function loadSettingsAccount() {
+  const { data: { user }, error } =
+    await supabaseClient.auth.getUser();
+
+  const email = document.getElementById('settingsEmail');
+
+  if (error || !user) {
+    email.textContent = 'Not logged in';
+    return;
+  }
+
+  email.textContent = user.email || 'Email unavailable';
+}
+
+document.getElementById('changePassword').addEventListener('click', async () => {
+  const newPassword = prompt('Enter your new password:');
+
+  if (!newPassword) return;
+
+  if (newPassword.length < 8) {
+    alert('Password must be at least 8 characters.');
+    return;
+  }
+
+  const confirmPassword = prompt('Confirm your new password:');
+
+  if (newPassword !== confirmPassword) {
+    alert('Passwords do not match.');
+    return;
+  }
+
+  const { error } = await supabaseClient.auth.updateUser({
+    password: newPassword
+  });
+
+  document.getElementById('passwordMessage').textContent =
+    error ? 'Could not change password: ' + error.message
+          : 'Password updated successfully!';
+});
+
+document.getElementById('settingsLogout').addEventListener('click', async () => {
+  if (!confirm('Are you sure you want to log out?')) return;
+
+  const { error } = await supabaseClient.auth.signOut();
+
+  if (error) {
+    document.getElementById('logoutMessage').textContent =
+      'Could not log out: ' + error.message;
+  }
+});
+
+loadSettingsAccount();
+
+
+
 </script>
 </body>
 </html>
