@@ -777,6 +777,7 @@ async function displayHealthRecords() {
       'Heart rate: ' + (record.heart_rate ?? 'Not entered') +
       ' BPM | Symptom: ' + (record.symptoms || 'Not entered') +
       ' | Pain location: ' + (record.pain_location || 'Not entered') +
+      ' | Daily Activities: ' + (record.daily_activities || 'Not entered') +
       ' | Notes: ' + (record.notes || 'None');
 
     item.append(heading, details);
@@ -806,6 +807,9 @@ async function displayHealthRecords() {
 
         document.getElementById('painLocation').value =
           record.pain_location || '';
+          
+        document.getElementById('dailyActivities').value =
+          record.daily_activities || '';
 
         document.getElementById('notes').value =
           record.notes || '';
