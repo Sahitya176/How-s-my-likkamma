@@ -765,9 +765,41 @@ h1 {
 </section>
 
 <section class="page" id="water">
-  <h1>Water tracker</h1>
-  <p class="subtitle">Daily hydration records.</p>
-  <div class="card"><p class="empty">Water tracking will be added later.</p></div>
+  <h1>Water Tracker 💧</h1>
+  <p class="subtitle">Keep track of daily hydration.</p>
+
+  <div class="card section-card">
+    <h3>Today's Water Intake</h3>
+    <h1 id="waterTotal">0 ml</h1>
+    <p id="waterProgress">No water entries yet.</p>
+  </div>
+
+  <div class="card section-card">
+    <h3>＋ Add Water</h3>
+
+    <label>Quantity (ml)</label>
+    <input type="number" id="waterAmount"
+      placeholder="Example: 250" min="1">
+
+    <br><br>
+
+    <label>Notes (optional)</label>
+    <input type="text" id="waterNotes"
+      placeholder="Optional notes">
+
+    <br><br>
+
+    <button class="btn" type="button" id="saveWater">
+      + Save Water
+    </button>
+
+    <p id="waterMessage"></p>
+  </div>
+
+  <div class="card section-card">
+    <h3>Water History</h3>
+    <div id="waterHistory">No records yet.</div>
+  </div>
 </section>
 
 <section class="page" id="wellbeing">
