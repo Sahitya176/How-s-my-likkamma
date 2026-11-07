@@ -2539,7 +2539,96 @@ document.getElementById('settingsLogout').addEventListener('click', async () => 
 });
 
 loadSettingsAccount();
+async function loadProfile() {
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if (!user) return;
 
+  const { data, error } = await supabaseClient
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  document.getElementById('profileDisplayName').value =
+    data?.display_name || 'Likkamma';
+}
+
+document.getElementById('saveProfile').addEventListener('click', async () => {
+  const message = document.getElementById('profileMessage');
+  const name = document.getElementById('profileDisplayName').value.trim();
+  const file = document.getElementById('profilePhoto').files[0];
+
+  if (!name) {
+    message.textContent = 'Please enter a display name.';
+    return;
+  }
+
+  message.textContent = 'Saving...';
+
+  const { data: { user }, error: authError } =
+    await supabaseClient.auth.getUser();
+
+  if (authError || !user) {
+    message.textContent = 'Please log in first.';
+    return;
+  }
+
+  const { data: existing } = await supabaseClient
+    .from('profiles')
+    .select('avatar_path')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  let avatarPath = existing?.avatar_path || null;
+
+  if (file) {
+    if (!file.type.startsWith('image/')) {
+      message.textContent = 'Please select an image.';
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      message.textContent = 'Image must be smaller than 5 MB.';
+      return;
+    }
+
+    const extension = file.name.split('.').pop().toLowerCase();
+    avatarPath = `${user.id}/avatar-${Date.now()}.${extension}`;
+
+    const { error: uploadError } = await supabaseClient
+      .storage
+      .from('profile-photos')
+      .upload(avatarPath, file, {
+        upsert: false,
+        contentType: file.type
+      });
+
+    if (uploadError) {
+      message.textContent = 'Photo upload failed: ' + uploadError.message;
+      return;
+    }
+  }
+
+  const { error } = await supabaseClient
+    .from('profiles')
+    .upsert({
+      id: user.id,
+      display_name: name,
+      avatar_path: avatarPath,
+      updated_at: new Date().toISOString()
+    });
+
+  message.textContent = error
+    ? 'Could not save profile: ' + error.message
+    : 'Profile saved successfully!';
+});
+
+loadProfile();
 
 
 </script>
