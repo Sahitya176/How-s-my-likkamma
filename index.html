@@ -1320,6 +1320,195 @@ supabaseClient.auth.onAuthStateChange((_event, session) => {
   }
 });
 
+// FOOD DIARY
+
+let editingMealId = null;
+
+function setDefaultMealDateTime() {
+  const now = new Date();
+
+  const date = [
+    now.getFullYear(),
+    String(now.getMonth() + 1).padStart(2, '0'),
+    String(now.getDate()).padStart(2, '0')
+  ].join('-');
+
+  const time = [
+    String(now.getHours()).padStart(2, '0'),
+    String(now.getMinutes()).padStart(2, '0')
+  ].join(':');
+
+  document.getElementById('mealDate').value = date;
+  document.getElementById('mealTime').value = time;
+}
+
+async function loadFoodEntries() {
+  const { data: { user } } = await supabaseClient.auth.getUser();
+
+  if (!user) return;
+
+  const history = document.getElementById('foodHistory');
+
+  const { data, error } = await supabaseClient
+    .from('food_entries')
+    .select('*')
+    .order('meal_date', { ascending: false })
+    .order('meal_time', { ascending: false });
+
+  if (error) {
+    history.textContent = 'Could not load meals.';
+    return;
+  }
+
+  history.innerHTML = '';
+
+  if (!data || data.length === 0) {
+    history.textContent = 'No meals recorded yet.';
+    return;
+  }
+
+  data.forEach(meal => {
+    const item = document.createElement('div');
+    item.className = 'card section-card';
+
+    const heading = document.createElement('h3');
+    heading.textContent = meal.meal_type;
+
+    const details = document.createElement('p');
+    details.textContent =
+      `${meal.meal_date} | ${meal.meal_time}`;
+
+    const food = document.createElement('p');
+    food.textContent = 'Food: ' + meal.food_items;
+
+    const portion = document.createElement('p');
+    portion.textContent = 'Portion: ' + (meal.portion || 'Not specified');
+
+    const notes = document.createElement('p');
+    notes.textContent = 'Notes: ' + (meal.notes || 'None');
+
+    const editButton = document.createElement('button');
+    editButton.className = 'btn';
+    editButton.textContent = 'Edit';
+
+    editButton.addEventListener('click', () => {
+      editingMealId = meal.id;
+
+      document.getElementById('mealDate').value = meal.meal_date;
+      document.getElementById('mealTime').value = meal.meal_time.slice(0, 5);
+      document.getElementById('mealType').value = meal.meal_type;
+      document.getElementById('foodItems').value = meal.food_items;
+      document.getElementById('foodPortion').value = meal.portion || '';
+      document.getElementById('foodNotes').value = meal.notes || '';
+
+      document.getElementById('saveMeal').textContent = 'Update meal';
+
+      document.getElementById('food').scrollIntoView({
+        behavior: 'smooth'
+      });
+    });
+
+    const deleteButton = document.createElement('button');
+    deleteButton.className = 'btn';
+    deleteButton.textContent = 'Delete';
+
+    deleteButton.addEventListener('click', async () => {
+      if (!confirm('Delete this meal record?')) return;
+
+      const { error } = await supabaseClient
+        .from('food_entries')
+        .delete()
+        .eq('id', meal.id)
+        .eq('owner_id', user.id);
+
+      if (error) {
+        alert('Could not delete meal: ' + error.message);
+        return;
+      }
+
+      await loadFoodEntries();
+    });
+
+    item.append(
+      heading, details, food, portion, notes,
+      editButton, deleteButton
+    );
+
+    history.appendChild(item);
+  });
+}
+
+document.getElementById('saveMeal').addEventListener('click', async () => {
+  const { data: { user } } = await supabaseClient.auth.getUser();
+
+  if (!user) {
+    alert('Please log in first.');
+    return;
+  }
+
+  const foodItems = document.getElementById('foodItems').value.trim();
+
+  if (!foodItems) {
+    alert('Please enter what you ate.');
+    return;
+  }
+
+  const meal = {
+    owner_id: user.id,
+    meal_date: document.getElementById('mealDate').value,
+    meal_time: document.getElementById('mealTime').value,
+    meal_type: document.getElementById('mealType').value,
+    food_items: foodItems,
+    portion: document.getElementById('foodPortion').value,
+    notes: document.getElementById('foodNotes').value
+  };
+
+  if (!meal.meal_date || !meal.meal_time) {
+    alert('Please select the date and time.');
+    return;
+  }
+
+  const button = document.getElementById('saveMeal');
+  button.disabled = true;
+
+  let result;
+
+  if (editingMealId) {
+    result = await supabaseClient
+      .from('food_entries')
+      .update(meal)
+      .eq('id', editingMealId)
+      .eq('owner_id', user.id);
+  } else {
+    result = await supabaseClient
+      .from('food_entries')
+      .insert([meal]);
+  }
+
+  button.disabled = false;
+
+  if (result.error) {
+    alert('Could not save meal: ' + result.error.message);
+    return;
+  }
+
+  editingMealId = null;
+
+  document.getElementById('foodItems').value = '';
+  document.getElementById('foodPortion').value = '';
+  document.getElementById('foodNotes').value = '';
+
+  button.textContent = '+ Save meal';
+
+  setDefaultMealDateTime();
+  document.getElementById('foodMessage').textContent =
+    'Meal saved successfully! ♡';
+
+  await loadFoodEntries();
+});
+
+setDefaultMealDateTime();
+loadFoodEntries();
 
 </script>
 </body>
