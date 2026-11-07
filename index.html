@@ -839,49 +839,70 @@ async function displayHealthRecords() {
 
 
 
-document.getElementById('healthForm').addEventListener('submit', function(event) {
+
+document.getElementById('healthForm').addEventListener('submit', async function(event) {
   event.preventDefault();
 
+  const { data: { user }, error: userError } =
+    await supabaseClient.auth.getUser();
+
+  if (userError || !user) {
+    alert('Please log in again.');
+    return;
+  }
+
+  const heartRateValue =
+    document.getElementById('heartRate').value;
+
   const record = {
-    id: Date.now().toString() + Math.random().toString(36).slice(2),
-    date: document.getElementById('recordDate').value,
-    time: document.getElementById('recordTime').value,
-    heartRate: document.getElementById('heartRate').value,
+    owner_id: user.id,
+    record_date: document.getElementById('recordDate').value,
+    record_time: document.getElementById('recordTime').value,
+    heart_rate: heartRateValue ? Number(heartRateValue) : null,
     symptoms: document.getElementById('symptoms').value,
-    painLocation: document.getElementById('painLocation').value,
+    pain_location: document.getElementById('painLocation').value,
     notes: document.getElementById('notes').value
   };
 
-  const records = getHealthRecords();
+  let result;
 
-if (editingRecordId) {
-  const index = records.findIndex(
-    item => item.id === editingRecordId
-  );
-
-  if (index !== -1) {
-    records[index] = {
-      ...record,
-      id: editingRecordId
-    };
+  if (editingRecordId) {
+    result = await supabaseClient
+      .from('health_records')
+      .update(record)
+      .eq('id', editingRecordId)
+      .select()
+      .single();
+  } else {
+    result = await supabaseClient
+      .from('health_records')
+      .insert(record)
+      .select()
+      .single();
   }
-} else {
-  records.push(record);
-}
 
-localStorage.setItem(healthKey, JSON.stringify(records));
+  if (result.error) {
+    alert('Could not save record: ' + result.error.message);
+    return;
+  }
 
-editingRecordId = null;
+  const wasEditing = Boolean(editingRecordId);
 
-document.querySelector('#healthForm button[type="submit"]')
-  .textContent = '+ Save health record';
+  editingRecordId = null;
+
+  document.querySelector('#healthForm button[type="submit"]')
+    .textContent = '+ Save health record';
 
   this.reset();
   setDefaultDateTime();
-  displayHealthRecords();
 
-  alert('Health record saved successfully!');
+  await displayHealthRecords();
+
+  alert(wasEditing
+    ? 'Health record updated successfully!'
+    : 'Health record saved successfully!');
 });
+
 
 setDefaultDateTime();
 displayHealthRecords();
