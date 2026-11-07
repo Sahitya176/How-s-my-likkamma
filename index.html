@@ -579,11 +579,63 @@ h1 {
   </div>
 </section>
 
+
 <section class="page" id="food">
-  <h1>Food diary</h1>
-  <p class="subtitle">Meals, portions and timings.</p>
-  <div class="card"><p class="empty">Food diary will be built in a later stage.</p></div>
+  <h1>Food Diary ♡</h1>
+  <p class="subtitle">Keep track of daily meals and eating habits.</p>
+
+  <div class="card section-card">
+    <h3>＋ Add a meal</h3>
+
+    <label>Date</label>
+    <input type="date" id="mealDate">
+
+    <br><br>
+    <label>Time</label>
+    <input type="time" id="mealTime">
+
+    <br><br>
+    <label>Meal type</label>
+    <select id="mealType">
+      <option value="Breakfast">Breakfast</option>
+      <option value="Lunch">Lunch</option>
+      <option value="Dinner">Dinner</option>
+      <option value="Snacks">Snacks</option>
+      <option value="Drinks">Drinks</option>
+    </select>
+
+    <br><br>
+    <label>What did you eat?</label>
+    <textarea id="foodItems"
+      placeholder="Enter food and drinks..."
+      rows="3"></textarea>
+
+    <br><br>
+    <label>Portion / Quantity</label>
+    <input type="text" id="foodPortion"
+      placeholder="Example: 1 bowl, 2 chapatis">
+
+    <br><br>
+    <label>Additional notes</label>
+    <textarea id="foodNotes"
+      placeholder="Any additional details..."
+      rows="3"></textarea>
+
+    <br><br>
+    <button class="btn" type="button" id="saveMeal">
+      + Save meal
+    </button>
+    <p id="foodMessage"></p>
+  </div>
+
+  <div class="card section-card">
+    <h3>Meal History</h3>
+    <div id="foodHistory">
+      No meals recorded yet.
+    </div>
+  </div>
 </section>
+
 
 <section class="page" id="insights">
   <h1>Health insights ✧</h1>
