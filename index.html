@@ -803,9 +803,64 @@ h1 {
 </section>
 
 <section class="page" id="wellbeing">
-  <h1>Personal wellbeing</h1>
-  <p class="subtitle">Daily activities and general wellbeing.</p>
-  <div class="card"><p class="empty">Wellbeing tracking will be added later.</p></div>
+  <h1>Personal Wellbeing ♡</h1>
+  <p class="subtitle">A little personal check-in.</p>
+
+  <div class="card section-card">
+    <h3>My Wellbeing</h3>
+
+    <label>eskunnama?</label>
+    <div>
+      <label>
+        <input type="radio" name="wellbeingDone"
+          value="Yes"> Yes
+      </label>
+
+      <label>
+        <input type="radio" name="wellbeingDone"
+          value="No"> No
+      </label>
+    </div>
+
+    <br>
+
+    <label>Duration:</label>
+    <input type="text" id="wellbeingDuration"
+      placeholder="Enter duration">
+
+    <br><br>
+
+    <label>Rating:</label>
+    <select id="wellbeingRating">
+      <option value="">Select rating</option>
+      <option value="1">⭐</option>
+      <option value="2">⭐⭐</option>
+      <option value="3">⭐⭐⭐</option>
+      <option value="4">⭐⭐⭐⭐</option>
+    </select>
+
+    <br><br>
+
+    <label>Additional notes (optional)</label>
+    <textarea id="wellbeingNotes"
+      placeholder="Anything to add..."
+      rows="3"></textarea>
+
+    <br><br>
+
+    <button class="btn" type="button" id="saveWellbeing">
+      + Save
+    </button>
+
+    <p id="wellbeingMessage"></p>
+  </div>
+
+  <div class="card section-card">
+    <h3>Wellbeing History</h3>
+    <div id="wellbeingHistory">
+      No records yet.
+    </div>
+  </div>
 </section>
 
 <section class="page" id="reports">
