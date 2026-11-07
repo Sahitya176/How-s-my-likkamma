@@ -945,14 +945,12 @@ h1 {
       <p class="empty">Your uploaded documents will appear here.</p>
     </div>
   </div>
-</section>
-
 
 <section class="page" id="settings">
   <h1>Settings ⚙</h1>
   <p class="subtitle">Customize your How's My experience.</p>
 
-  <div class="card">
+  <div class="card section-card">
     <h3>Choose your theme</h3>
     <p class="empty">Select a colour to change your website appearance.</p>
 
@@ -964,11 +962,41 @@ h1 {
       <button class="swatch" style="background:#e8b779" onclick="theme('#e8b779','#fff6e9')" aria-label="Orange"></button>
     </div>
 
-    <label>Choose any custom colour</label><br>
+    <label>Choose any custom colour</label>
     <input type="color" class="color-picker" id="customColor" value="#e8a8bd">
-    <button class="btn" onclick="customTheme()">Apply colour</button>
+    <button class="btn" type="button" onclick="customTheme()">Apply colour</button>
   </div>
+
+  <div class="card section-card">
+    <h3>Account Information</h3>
+    <p>Logged-in email:</p>
+    <p id="settingsEmail">Loading...</p>
+  </div>
+
+  <div class="card section-card">
+    <h3>Security</h3>
+    <button class="btn" type="button" id="changePassword">
+      Change Password
+    </button>
+    <p id="passwordMessage"></p>
+  </div>
+
+  <div class="card section-card">
+    <h3>Privacy</h3>
+    <p>Your health records are protected by account-based access controls.</p>
+    <p>Only grant access to someone with the account owner's knowledge and permission.</p>
+  </div>
+
+  <div class="card section-card">
+    <h3>Account</h3>
+    <button class="btn" type="button" id="settingsLogout">
+      Log Out
+    </button>
+    <p id="logoutMessage"></p>
+  </div>
+
 </section>
+
 
 </main>
 
