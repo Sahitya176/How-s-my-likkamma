@@ -2581,19 +2581,7 @@ async function loadProfile() {
   }
 }
 
-  const { data: { user } } = await supabaseClient.auth.getUser();
-  if (!user) return;
 
-  const { data, error } = await supabaseClient
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .maybeSingle();
-
-  if (error) {
-    console.error(error);
-    return;
-  }
 
   document.getElementById('profileDisplayName').value =
     data?.display_name || 'Likkamma';
