@@ -719,86 +719,125 @@ function setDefaultDateTime() {
     now.toTimeString().slice(0, 5);
 }
 
-function displayHealthRecords() {
-  const records = getHealthRecords();
+
+async function displayHealthRecords() {
   const history = document.getElementById('healthHistory');
 
-  history.innerHTML = '';
+  history.innerHTML = 'Loading health records...';
 
-  if (records.length === 0) {
-    history.textContent = 'No records saved yet.';
+  const { data: { user }, error: userError } =
+    await supabaseClient.auth.getUser();
+
+  if (userError || !user) {
+    history.textContent = 'Please log in to view records.';
     return;
   }
 
-  records.sort((a, b) =>
-    (b.date + b.time).localeCompare(a.date + a.time)
-  );
+  const { data: records, error } = await supabaseClient
+    .from('health_records')
+    .select('*')
+    .order('record_date', { ascending: false })
+    .order('record_time', { ascending: false });
+
+  if (error) {
+    history.textContent = 'Could not load records: ' + error.message;
+    return;
+  }
+
+  history.innerHTML = '';
+
+  if (!records || records.length === 0) {
+    history.textContent = 'No records saved yet.';
+    return;
+  }
 
   records.forEach(record => {
     const item = document.createElement('div');
     item.className = 'insight';
 
     const heading = document.createElement('h3');
-    heading.textContent = record.date + ' • ' + record.time;
+    heading.textContent =
+      record.record_date + ' • ' + record.record_time;
 
     const details = document.createElement('p');
     details.textContent =
-      'Heart rate: ' + (record.heartRate || 'Not entered') +
+      'Heart rate: ' + (record.heart_rate ?? 'Not entered') +
       ' BPM | Symptom: ' + (record.symptoms || 'Not entered') +
-      ' | Pain location: ' + (record.painLocation || 'Not entered') +
+      ' | Pain location: ' + (record.pain_location || 'Not entered') +
       ' | Notes: ' + (record.notes || 'None');
 
-    const editButton = document.createElement('button');
-editButton.type = 'button';
-editButton.className = 'btn';
-editButton.textContent = '✏️ Edit record';
-editButton.style.marginRight = '8px';
+    item.append(heading, details);
 
-editButton.addEventListener('click', function() {
-  editingRecordId = record.id;
+    // Only the record owner can edit or delete.
+    if (record.owner_id === user.id) {
+      const editButton = document.createElement('button');
+      editButton.type = 'button';
+      editButton.className = 'btn';
+      editButton.textContent = '✏️ Edit record';
+      editButton.style.marginRight = '8px';
 
-  document.getElementById('recordDate').value = record.date;
-  document.getElementById('recordTime').value = record.time;
-  document.getElementById('heartRate').value = record.heartRate;
-  document.getElementById('symptoms').value = record.symptoms;
-  document.getElementById('painLocation').value = record.painLocation;
-  document.getElementById('notes').value = record.notes;
+      editButton.addEventListener('click', function() {
+        editingRecordId = record.id;
 
-  document.querySelector('#healthForm button[type="submit"]')
-    .textContent = 'Update health record';
+        document.getElementById('recordDate').value =
+          record.record_date;
 
-  document.getElementById('healthForm').scrollIntoView({
-    behavior: 'smooth'
-  });
-});
+        document.getElementById('recordTime').value =
+          record.record_time.slice(0, 5);
 
-    const deleteButton = document.createElement('button');
-    deleteButton.type = 'button';
-    deleteButton.className = 'btn';
-    deleteButton.textContent = '🗑 Delete';
-    deleteButton.style.background = '#f8dce5';
+        document.getElementById('heartRate').value =
+          record.heart_rate ?? '';
 
-    deleteButton.addEventListener('click', function() {
-      if (!confirm('Are you sure you want to delete this health record?')) {
-        return;
-      }
+        document.getElementById('symptoms').value =
+          record.symptoms || '';
 
-      const updatedRecords = getHealthRecords().filter(
-        entry => entry.id !== record.id
-      );
+        document.getElementById('painLocation').value =
+          record.pain_location || '';
 
-      localStorage.setItem(
-        healthKey,
-        JSON.stringify(updatedRecords)
-      );
+        document.getElementById('notes').value =
+          record.notes || '';
 
-      displayHealthRecords();
-    });
+        document.querySelector(
+          '#healthForm button[type="submit"]'
+        ).textContent = 'Update health record';
 
-    item.append(heading, details, editButton, deleteButton);
+        document.getElementById('healthForm').scrollIntoView({
+          behavior: 'smooth'
+        });
+      });
+
+      const deleteButton = document.createElement('button');
+      deleteButton.type = 'button';
+      deleteButton.className = 'btn';
+      deleteButton.textContent = '🗑 Delete';
+      deleteButton.style.background = '#f8dce5';
+
+      deleteButton.addEventListener('click', async function() {
+        if (!confirm('Are you sure you want to delete this health record?')) {
+          return;
+        }
+
+        const { error: deleteError } = await supabaseClient
+          .from('health_records')
+          .delete()
+          .eq('id', record.id);
+
+        if (deleteError) {
+          alert('Delete failed: ' + deleteError.message);
+          return;
+        }
+
+        displayHealthRecords();
+      });
+
+      item.append(editButton, deleteButton);
+    }
+
     history.appendChild(item);
   });
 }
+
+
 
 document.getElementById('healthForm').addEventListener('submit', function(event) {
   event.preventDefault();
