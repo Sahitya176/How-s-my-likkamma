@@ -1082,6 +1082,160 @@ supabaseClient.auth.getSession().then(({ data, error }) => {
   }
 });
 
+// MEDICAL DOCUMENT VAULT
+
+const medicalFileInput = document.getElementById('medicalFile');
+const uploadMedicalButton = document.getElementById('uploadMedicalFile');
+const medicalVaultMessage = document.getElementById('medicalVaultMessage');
+const medicalVaultList = document.getElementById('medicalVaultList');
+
+async function uploadMedicalDocument() {
+  const file = medicalFileInput.files[0];
+
+  if (!file) {
+    medicalVaultMessage.textContent = 'Please choose a document first.';
+    return;
+  }
+
+  if (file.size > 10 * 1024 * 1024) {
+    medicalVaultMessage.textContent = 'File must be smaller than 10 MB.';
+    return;
+  }
+
+  const { data: { user } } = await supabaseClient.auth.getUser();
+
+  if (!user) {
+    medicalVaultMessage.textContent = 'Please log in first.';
+    return;
+  }
+
+  const type = document.getElementById('medicalDocType').value;
+  const date = document.getElementById('medicalDocDate').value;
+
+  if (!date) {
+    medicalVaultMessage.textContent = 'Please select the document date.';
+    return;
+  }
+
+  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+  const fileName = `${date}__${type.replace(/[^a-zA-Z0-9_-]/g, '_')}__${Date.now()}_${safeName}`;
+  const filePath = `${user.id}/${fileName}`;
+
+  medicalVaultMessage.textContent = 'Uploading document...';
+  uploadMedicalButton.disabled = true;
+
+  const { error } = await supabaseClient.storage
+    .from('medical-documents')
+    .upload(filePath, file);
+
+  uploadMedicalButton.disabled = false;
+
+  if (error) {
+    medicalVaultMessage.textContent = 'Upload failed: ' + error.message;
+    return;
+  }
+
+  medicalFileInput.value = '';
+  medicalVaultMessage.textContent = 'Document uploaded successfully!';
+
+  await loadMedicalDocuments();
+}
+
+async function loadMedicalDocuments() {
+  medicalVaultList.textContent = 'Loading documents...';
+
+  const { data: { user }, error: userError } =
+    await supabaseClient.auth.getUser();
+
+  if (userError || !user) {
+    medicalVaultList.textContent = 'Please log in to view documents.';
+    return;
+  }
+
+  const ownerIds = [user.id];
+
+  const { data: grants, error: grantError } = await supabaseClient
+    .from('health_access')
+    .select('owner_id')
+    .eq('viewer_id', user.id)
+    .eq('permission', 'view');
+
+  if (!grantError && grants) {
+    grants.forEach(grant => {
+      if (!ownerIds.includes(grant.owner_id)) {
+        ownerIds.push(grant.owner_id);
+      }
+    });
+  }
+
+  medicalVaultList.innerHTML = '';
+  let totalFiles = 0;
+
+  for (const ownerId of ownerIds) {
+    const { data: files, error } = await supabaseClient.storage
+      .from('medical-documents')
+      .list(ownerId, {
+        limit: 100,
+        sortBy: { column: 'created_at', order: 'desc' }
+      });
+
+    if (error) {
+      console.error('Document listing error:', error.message);
+      continue;
+    }
+
+    for (const file of (files || [])) {
+      if (!file.name || file.name.startsWith('.')) continue;
+
+      const filePath = `${ownerId}/${file.name}`;
+
+      const { data: signed, error: signedError } =
+        await supabaseClient.storage
+          .from('medical-documents')
+          .createSignedUrl(filePath, 60);
+
+      if (signedError) continue;
+
+      const parts = file.name.split('__');
+      const date = parts[0] || 'Date unavailable';
+      const type = parts[1] || 'Medical document';
+
+      const item = document.createElement('div');
+      item.className = 'insight';
+
+      const heading = document.createElement('h3');
+      heading.textContent = type;
+
+      const info = document.createElement('p');
+      info.textContent = 'Date: ' + date +
+        (ownerId === user.id ? ' • Your documents' : ' • Shared documents');
+
+      const link = document.createElement('a');
+      link.href = signed.signedUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = 'View / Download document';
+
+      item.append(heading, info, link);
+      medicalVaultList.appendChild(item);
+      totalFiles++;
+    }
+  }
+
+  if (totalFiles === 0) {
+    medicalVaultList.textContent = 'No documents uploaded yet.';
+  }
+}
+
+uploadMedicalButton.addEventListener('click', uploadMedicalDocument);
+
+supabaseClient.auth.onAuthStateChange((_event, session) => {
+  if (session) {
+    loadMedicalDocuments();
+  }
+});
+
+
 </script>
 </body>
 </html>
