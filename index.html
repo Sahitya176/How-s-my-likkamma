@@ -578,6 +578,13 @@ restoreTheme();
   // HEALTH RECORD STORAGE — TEST DATA ONLY
 
 const healthKey = 'howsmy_health_records';
+const SUPABASE_URL = 'https://tsjnfpgcovcdfuncfoan.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_sfHbLpVyKwSVjnRyY1tWaQ_pdqfxwZ7';
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
   let editingRecordId = null;
 
 function getHealthRecords() {
