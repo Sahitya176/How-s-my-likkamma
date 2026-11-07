@@ -1,0 +1,526 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#fff5f8">
+<title>How's My ♡</title>
+
+<style>
+:root {
+  --pink: #e8a8bd;
+  --soft: #fff0f5;
+  --bg: #fffafb;
+  --white: #ffffff;
+  --text: #51414a;
+  --muted: #a18d96;
+  --border: #f3e5eb;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+button {
+  cursor: pointer;
+  font: inherit;
+}
+
+.app { min-height: 100vh; }
+
+/* DESKTOP SIDEBAR */
+
+.sidebar {
+  position: fixed;
+  width: 245px;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  padding: 30px 18px;
+  background: white;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
+
+.logo {
+  font-size: 25px;
+  font-weight: 800;
+  margin: 0 0 38px 8px;
+}
+
+.logo span { color: var(--pink); }
+
+.nav-label {
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 1.5px;
+  margin: 18px 10px 10px;
+}
+
+.nav-btn {
+  width: 100%;
+  display: flex;
+  gap: 13px;
+  align-items: center;
+  padding: 13px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  border-radius: 12px;
+  text-align: left;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.nav-btn.active {
+  background: var(--soft);
+  color: var(--text);
+  font-weight: 700;
+}
+
+.nav-icon { font-size: 19px; }
+
+.sidebar-bottom {
+  margin-top: auto;
+  padding: 15px;
+  background: var(--soft);
+  border-radius: 15px;
+  font-size: 12px;
+}
+
+/* MAIN AREA */
+
+.main {
+  margin-left: 245px;
+  padding: 28px 38px 50px;
+  max-width: 1500px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 38px;
+}
+
+.date { font-size: 13px; color: var(--muted); }
+
+.profile {
+  background: var(--soft);
+  border-radius: 50px;
+  padding: 11px 16px;
+  font-size: 13px;
+}
+
+.page { display: none; }
+.page.active { display: block; }
+
+h1 {
+  font-size: 30px;
+  margin: 0 0 8px;
+}
+
+.subtitle {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 0 0 27px;
+}
+
+.welcome {
+  padding: 28px;
+  border-radius: 22px;
+  background: linear-gradient(115deg, #fce6ee, #fff6f8);
+  margin-bottom: 24px;
+}
+
+.welcome h2 { margin: 0 0 9px; font-size: 25px; }
+.welcome p { color: #947b86; font-size: 13px; }
+
+.btn {
+  background: var(--pink);
+  color: #493640;
+  padding: 12px 19px;
+  border: none;
+  border-radius: 11px;
+  font-weight: 650;
+  margin-top: 10px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 23px;
+}
+
+.card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 21px;
+  min-width: 0;
+}
+
+.card-label {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.card-value {
+  font-size: 28px;
+  font-weight: 750;
+  margin: 14px 0 7px;
+}
+
+.card-note {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 18px;
+}
+
+.insight {
+  background: #fff7fa;
+  border: 1px solid #f5e4eb;
+  padding: 20px;
+  border-radius: 16px;
+  margin-top: 15px;
+}
+
+.insight-title { font-weight: 700; margin-bottom: 8px; }
+
+.empty {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.section-card { margin-bottom: 18px; }
+
+.section-card h3 { margin-top: 0; }
+
+.theme-options {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+
+.swatch {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 2px solid white;
+  outline: 1px solid var(--border);
+}
+
+.color-picker {
+  width: 65px;
+  height: 45px;
+  border: none;
+  background: transparent;
+}
+
+/* MOBILE BOTTOM NAV */
+
+.mobile-nav { display: none; }
+
+@media(max-width: 850px) {
+  .sidebar { display: none; }
+
+  .main {
+    margin-left: 0;
+    padding: 20px 17px 105px;
+  }
+
+  .topbar { margin-bottom: 28px; }
+
+  h1 { font-size: 25px; }
+
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 11px;
+  }
+
+  .card { padding: 16px; }
+  .card-value { font-size: 24px; }
+
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mobile-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-top: 1px solid var(--border);
+    justify-content: space-around;
+    padding: 9px 3px max(10px, env(safe-area-inset-bottom));
+    z-index: 5;
+  }
+
+  .mobile-nav button {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 10px;
+    padding: 5px 2px;
+    flex: 1;
+  }
+
+  .mobile-nav button.active { color: #b96c8b; font-weight: 700; }
+
+  .mobile-nav span {
+    display: block;
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<!-- DESKTOP SIDEBAR -->
+<aside class="sidebar">
+  <div class="logo">How's My<span> ♡</span></div>
+
+  <div class="nav-label">MAIN MENU</div>
+  <button class="nav-btn active" data-page="home">⌂ Dashboard</button>
+  <button class="nav-btn" data-page="medical">♡ Medical</button>
+  <button class="nav-btn" data-page="food">♧ Food diary</button>
+  <button class="nav-btn" data-page="insights">✧ Health insights</button>
+
+  <div class="nav-label">LIFESTYLE</div>
+  <button class="nav-btn" data-page="lifestyle">☀ Smoking & drinking</button>
+  <button class="nav-btn" data-page="water">♢ Water tracker</button>
+  <button class="nav-btn" data-page="wellbeing">♡ Personal wellbeing</button>
+
+  <div class="nav-label">RECORDS</div>
+  <button class="nav-btn" data-page="reports">▤ Monthly reports</button>
+  <button class="nav-btn" data-page="files">▣ Medical vault</button>
+
+  <div class="nav-label">PREFERENCES</div>
+  <button class="nav-btn" data-page="settings">⚙ Settings</button>
+
+  <div class="sidebar-bottom">
+    ♡ Your health matters.<br>
+    One day at a time.
+  </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+
+<header class="topbar">
+  <div>
+    <div class="date" id="date"></div>
+  </div>
+  <div class="profile">♡ Personal health space</div>
+</header>
+
+<!-- DASHBOARD -->
+<section class="page active" id="home">
+  <h1>Good day ♡</h1>
+  <p class="subtitle">Here's your health overview.</p>
+
+  <div class="welcome">
+    <h2>Your health, your journey.</h2>
+    <p>Small daily records help you understand your health over time.</p>
+    <button class="btn" onclick="go('medical')">Explore medical records →</button>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card-label">♡ HEART RATE</div>
+      <div class="card-value">-- BPM</div>
+      <div class="card-note">No records yet</div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">✿ SYMPTOMS</div>
+      <div class="card-value">--</div>
+      <div class="card-note">Today's entries</div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">♧ FOOD LOGS</div>
+      <div class="card-value">--</div>
+      <div class="card-note">Meals recorded</div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">▤ HEALTH RECORDS</div>
+      <div class="card-value">--</div>
+      <div class="card-note">Saved entries</div>
+    </div>
+  </div>
+
+  <div class="content-grid">
+    <div class="card">
+      <h3>Today's health timeline</h3>
+      <p class="empty">Your daily food, symptoms, heart rate and activities will appear here chronologically.</p>
+    </div>
+
+    <div class="card">
+      <h3>Health insights ✧</h3>
+      <div class="insight">
+        <div class="insight-title">Intelligent observations</div>
+        <p class="empty">Insights will appear once enough records have been collected.</p>
+      </div>
+      <p class="card-note">Observations are not medical diagnoses.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PLACEHOLDER PAGES -->
+<section class="page" id="medical">
+  <h1>Medical ♡</h1>
+  <p class="subtitle">Heart rate, symptoms and medical updates.</p>
+  <div class="card section-card">
+    <h3>Medical dashboard</h3>
+    <p class="empty">Daily health logs and symptom tracking will be built in Stage 2.</p>
+  </div>
+</section>
+
+<section class="page" id="food">
+  <h1>Food diary</h1>
+  <p class="subtitle">Meals, portions and timings.</p>
+  <div class="card"><p class="empty">Food diary will be built in a later stage.</p></div>
+</section>
+
+<section class="page" id="insights">
+  <h1>Health insights ✧</h1>
+  <p class="subtitle">Understand patterns in recorded information.</p>
+  <div class="card">
+    <h3>Intelligent observations</h3>
+    <p class="empty">We'll analyse repeated associations between recorded meals, symptoms, heart rate and activities. These observations cannot establish medical causes.</p>
+  </div>
+</section>
+
+<section class="page" id="lifestyle">
+  <h1>Smoking & drinking</h1>
+  <p class="subtitle">Optional lifestyle records.</p>
+  <div class="card"><p class="empty">Lifestyle tracking will be added later.</p></div>
+</section>
+
+<section class="page" id="water">
+  <h1>Water tracker</h1>
+  <p class="subtitle">Daily hydration records.</p>
+  <div class="card"><p class="empty">Water tracking will be added later.</p></div>
+</section>
+
+<section class="page" id="wellbeing">
+  <h1>Personal wellbeing</h1>
+  <p class="subtitle">Daily activities and general wellbeing.</p>
+  <div class="card"><p class="empty">Wellbeing tracking will be added later.</p></div>
+</section>
+
+<section class="page" id="reports">
+  <h1>Monthly reports</h1>
+  <p class="subtitle">Your health history at a glance.</p>
+  <div class="card"><p class="empty">Monthly and six-month reports will be added later.</p></div>
+</section>
+
+<section class="page" id="files">
+  <h1>Medical vault</h1>
+  <p class="subtitle">A secure place for medical documents.</p>
+  <div class="card"><p class="empty">Private document storage will be configured in a later stage.</p></div>
+</section>
+
+<section class="page" id="settings">
+  <h1>Settings ⚙</h1>
+  <p class="subtitle">Customize your How's My experience.</p>
+
+  <div class="card">
+    <h3>Choose your theme</h3>
+    <p class="empty">Select a colour to change your website appearance.</p>
+
+    <div class="theme-options">
+      <button class="swatch" style="background:#e8a8bd" onclick="theme('#e8a8bd','#fff0f5')" aria-label="Pink"></button>
+      <button class="swatch" style="background:#9eb9ed" onclick="theme('#9eb9ed','#eff4ff')" aria-label="Blue"></button>
+      <button class="swatch" style="background:#b6a3e5" onclick="theme('#b6a3e5','#f4f0ff')" aria-label="Purple"></button>
+      <button class="swatch" style="background:#9fcbb4" onclick="theme('#9fcbb4','#eff9f2')" aria-label="Green"></button>
+      <button class="swatch" style="background:#e8b779" onclick="theme('#e8b779','#fff6e9')" aria-label="Orange"></button>
+    </div>
+
+    <label>Choose any custom colour</label><br>
+    <input type="color" class="color-picker" id="customColor" value="#e8a8bd">
+    <button class="btn" onclick="customTheme()">Apply colour</button>
+  </div>
+</section>
+
+</main>
+
+<!-- MOBILE NAV -->
+<nav class="mobile-nav">
+  <button class="active" data-page="home" onclick="go('home')"><span>⌂</span>Home</button>
+  <button data-page="medical" onclick="go('medical')"><span>♡</span>Medical</button>
+  <button data-page="food" onclick="go('food')"><span>♧</span>Food</button>
+  <button data-page="insights" onclick="go('insights')"><span>✧</span>Insights</button>
+  <button data-page="settings" onclick="go('settings')"><span>⚙</span>Settings</button>
+</nav>
+
+</div>
+
+<script>
+const buttons = document.querySelectorAll('[data-page]');
+
+function go(page) {
+  document.querySelectorAll('.page').forEach(el => {
+    el.classList.toggle('active', el.id === page);
+  });
+
+  buttons.forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.page === page);
+  });
+
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+document.querySelectorAll('.sidebar .nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => go(btn.dataset.page));
+});
+
+function theme(accent, soft) {
+  document.documentElement.style.setProperty('--pink', accent);
+  document.documentElement.style.setProperty('--soft', soft);
+  localStorage.setItem('howsmy_theme', JSON.stringify({accent,soft}));
+}
+
+function customTheme() {
+  const accent = document.getElementById('customColor').value;
+  // A neutral light background is used for custom colours.
+  theme(accent, '#f8f3f5');
+}
+
+function restoreTheme() {
+  const saved = JSON.parse(localStorage.getItem('howsmy_theme') || 'null');
+  if(saved) theme(saved.accent, saved.soft);
+}
+
+document.getElementById('date').textContent =
+  new Date().toLocaleDateString(undefined, {
+    weekday:'long', day:'numeric', month:'long', year:'numeric'
+  });
+
+restoreTheme();
+</script>
+</body>
+</html>
