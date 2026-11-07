@@ -638,12 +638,52 @@ h1 {
 
 
 <section class="page" id="insights">
-  <h1>Health insights ✧</h1>
+  <h1>Health Insights ✧</h1>
   <p class="subtitle">Understand patterns in recorded information.</p>
-  <div class="card">
-    <h3>Intelligent observations</h3>
-    <p class="empty">We'll analyse repeated associations between recorded meals, symptoms, heart rate and activities. These observations cannot establish medical causes.</p>
+
+  <div class="card section-card">
+    <h3>♡ Health Overview</h3>
+    <div id="insightOverview">
+      Loading health information...
+    </div>
   </div>
+
+  <div class="card section-card">
+    <h3>Heart Rate History</h3>
+    <div id="heartRateInsights">
+      No information available yet.
+    </div>
+  </div>
+
+  <div class="card section-card">
+    <h3>Symptom Patterns</h3>
+    <div id="symptomInsights">
+      No information available yet.
+    </div>
+  </div>
+
+  <div class="card section-card">
+    <h3>Daily Activity Insights</h3>
+    <div id="activityInsights">
+      No information available yet.
+    </div>
+  </div>
+
+  <div class="card section-card">
+    <h3>Food & Health Observations</h3>
+    <div id="foodInsights">
+      No information available yet.
+    </div>
+  </div>
+
+  <p class="empty">
+    These insights describe recorded patterns only. They cannot diagnose
+    conditions or establish medical causes.
+  </p>
+
+  <button class="btn" type="button" id="refreshInsights">
+    ↻ Refresh Insights
+  </button>
 </section>
 
 <section class="page" id="lifestyle">
