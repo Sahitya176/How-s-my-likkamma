@@ -1907,6 +1907,187 @@ document.getElementById('saveLifestyle')
 
 loadLifestyleRecords();
 
+// WATER TRACKER
+
+let editingWaterId = null;
+
+async function loadWaterEntries() {
+  const { data: { user } } = await supabaseClient.auth.getUser();
+
+  if (!user) return;
+
+  const history = document.getElementById('waterHistory');
+
+  const { data, error } = await supabaseClient
+    .from('water_entries')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    history.textContent = 'Could not load water records.';
+    return;
+  }
+
+  history.innerHTML = '';
+
+  const today = new Date().toLocaleDateString();
+
+  const todayEntries = (data || []).filter(entry =>
+    new Date(entry.created_at).toLocaleDateString() === today
+  );
+
+  const total = todayEntries.reduce(
+    (sum, entry) => sum + entry.amount_ml, 0
+  );
+
+  document.getElementById('waterTotal').textContent =
+    total.toLocaleString() + ' ml';
+
+  document.getElementById('waterProgress').textContent =
+    todayEntries.length
+      ? `${todayEntries.length} water entries recorded today.`
+      : 'No water entries yet today.';
+
+  if (!data || data.length === 0) {
+    history.textContent = 'No records yet.';
+    return;
+  }
+
+  data.forEach(entry => {
+    const item = document.createElement('div');
+    item.className = 'card section-card';
+
+    const heading = document.createElement('h3');
+    heading.textContent = entry.amount_ml + ' ml';
+
+    const date = document.createElement('p');
+    date.textContent =
+      new Date(entry.created_at).toLocaleString();
+
+    const notes = document.createElement('p');
+    notes.textContent = 'Notes: ' + (entry.notes || 'None');
+
+    const editButton = document.createElement('button');
+    editButton.className = 'btn';
+    editButton.textContent = 'Edit';
+
+    editButton.addEventListener('click', () => {
+      editingWaterId = entry.id;
+
+      document.getElementById('waterAmount').value =
+        entry.amount_ml;
+
+      document.getElementById('waterNotes').value =
+        entry.notes || '';
+
+      document.getElementById('saveWater').textContent =
+        'Update Water';
+
+      document.getElementById('water').scrollIntoView({
+        behavior: 'smooth'
+      });
+    });
+
+    const deleteButton = document.createElement('button');
+    deleteButton.className = 'btn';
+    deleteButton.textContent = 'Delete';
+
+    deleteButton.addEventListener('click', async () => {
+      if (!confirm('Delete this water record?')) return;
+
+      const { error } = await supabaseClient
+        .from('water_entries')
+        .delete()
+        .eq('id', entry.id)
+        .eq('owner_id', user.id);
+
+      if (error) {
+        alert('Delete failed: ' + error.message);
+        return;
+      }
+
+      if (editingWaterId === entry.id) {
+        editingWaterId = null;
+        document.getElementById('waterAmount').value = '';
+        document.getElementById('waterNotes').value = '';
+        document.getElementById('saveWater').textContent =
+          '+ Save Water';
+      }
+
+      await loadWaterEntries();
+    });
+
+    item.append(heading, date, notes, editButton, deleteButton);
+    history.appendChild(item);
+  });
+}
+
+document.getElementById('saveWater')
+  .addEventListener('click', async () => {
+
+    const { data: { user } } = await supabaseClient.auth.getUser();
+
+    if (!user) {
+      alert('Please log in first.');
+      return;
+    }
+
+    const amount = Number(
+      document.getElementById('waterAmount').value
+    );
+
+    if (!Number.isInteger(amount) || amount <= 0) {
+      alert('Please enter a valid water quantity in ml.');
+      return;
+    }
+
+    const record = {
+      owner_id: user.id,
+      amount_ml: amount,
+      notes: document.getElementById('waterNotes').value.trim()
+    };
+
+    const button = document.getElementById('saveWater');
+    button.disabled = true;
+
+    let result;
+
+    if (editingWaterId) {
+      result = await supabaseClient
+        .from('water_entries')
+        .update({
+          amount_ml: record.amount_ml,
+          notes: record.notes
+        })
+        .eq('id', editingWaterId)
+        .eq('owner_id', user.id);
+    } else {
+      result = await supabaseClient
+        .from('water_entries')
+        .insert([record]);
+    }
+
+    button.disabled = false;
+
+    if (result.error) {
+      alert('Could not save water record: ' + result.error.message);
+      return;
+    }
+
+    editingWaterId = null;
+
+    document.getElementById('waterAmount').value = '';
+    document.getElementById('waterNotes').value = '';
+
+    button.textContent = '+ Save Water';
+
+    document.getElementById('waterMessage').textContent =
+      'Water record saved successfully!';
+
+    await loadWaterEntries();
+  });
+
+loadWaterEntries();
 </script>
 </body>
 </html>
