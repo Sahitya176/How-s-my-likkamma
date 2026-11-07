@@ -1217,7 +1217,39 @@ async function loadMedicalDocuments() {
       link.rel = 'noopener noreferrer';
       link.textContent = 'View / Download document';
 
-      item.append(heading, info, link);
+     
+if (ownerId === user.id) {
+  const deleteButton = document.createElement('button');
+  deleteButton.type = 'button';
+  deleteButton.className = 'btn';
+  deleteButton.textContent = 'Delete';
+
+  deleteButton.addEventListener('click', async () => {
+    if (!confirm('Are you sure you want to delete this document?')) {
+      return;
+    }
+
+    deleteButton.disabled = true;
+
+    const { error: deleteError } = await supabaseClient.storage
+      .from('medical-documents')
+      .remove([filePath]);
+
+    if (deleteError) {
+      alert('Could not delete document: ' + deleteError.message);
+      deleteButton.disabled = false;
+      return;
+    }
+
+    alert('Document deleted successfully!');
+    await loadMedicalDocuments();
+  });
+
+  item.append(heading, info, link, deleteButton);
+} else {
+  item.append(heading, info, link);
+}
+
       medicalVaultList.appendChild(item);
       totalFiles++;
     }
