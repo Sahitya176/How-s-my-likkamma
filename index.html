@@ -912,7 +912,16 @@ setDefaultDateTime();
 displayHealthRecords();
 
 // AUTHENTICATION
+document.getElementById('logoutButton').addEventListener('click', async function() {
+  const { error } = await supabaseClient.auth.signOut();
 
+  if (error) {
+    alert('Logout failed: ' + error.message);
+    return;
+  }
+
+  showAuth();
+});
 const authScreen = document.getElementById('authScreen');
 const appElement = document.querySelector('.app');
 const authMessage = document.getElementById('authMessage');
