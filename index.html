@@ -600,13 +600,12 @@ function displayHealthRecords() {
   const records = getHealthRecords();
   const history = document.getElementById('healthHistory');
 
+  history.innerHTML = '';
+
   if (records.length === 0) {
-    history.innerHTML =
-      '<p class="empty">No records saved yet.</p>';
+    history.textContent = 'No records saved yet.';
     return;
   }
-
-  history.innerHTML = '';
 
   records.sort((a, b) =>
     (b.date + b.time).localeCompare(a.date + a.time)
@@ -616,7 +615,7 @@ function displayHealthRecords() {
     const item = document.createElement('div');
     item.className = 'insight';
 
-    const heading = document.createElement('strong');
+    const heading = document.createElement('h3');
     heading.textContent = record.date + ' • ' + record.time;
 
     const details = document.createElement('p');
@@ -626,7 +625,30 @@ function displayHealthRecords() {
       ' | Pain location: ' + (record.painLocation || 'Not entered') +
       ' | Notes: ' + (record.notes || 'None');
 
-    item.append(heading, details);
+    const deleteButton = document.createElement('button');
+    deleteButton.type = 'button';
+    deleteButton.className = 'btn';
+    deleteButton.textContent = '🗑 Delete record';
+    deleteButton.style.background = '#f8dce5';
+
+    deleteButton.addEventListener('click', function() {
+      if (!confirm('Are you sure you want to delete this health record?')) {
+        return;
+      }
+
+      const updatedRecords = getHealthRecords().filter(
+        entry => entry.id !== record.id
+      );
+
+      localStorage.setItem(
+        healthKey,
+        JSON.stringify(updatedRecords)
+      );
+
+      displayHealthRecords();
+    });
+
+    item.append(heading, details, deleteButton);
     history.appendChild(item);
   });
 }
