@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -576,6 +575,7 @@ restoreTheme();
   // HEALTH RECORD STORAGE — TEST DATA ONLY
 
 const healthKey = 'howsmy_health_records';
+  let editingRecordId = null;
 
 function getHealthRecords() {
   return JSON.parse(localStorage.getItem(healthKey) || '[]');
@@ -628,7 +628,7 @@ function displayHealthRecords() {
     const deleteButton = document.createElement('button');
     deleteButton.type = 'button';
     deleteButton.className = 'btn';
-    deleteButton.textContent = '🗑 Delete record';
+    deleteButton.textContent = '🗑 Delete';
     deleteButton.style.background = '#f8dce5';
 
     deleteButton.addEventListener('click', function() {
