@@ -618,11 +618,49 @@ h1 {
   <div class="card"><p class="empty">Monthly and six-month reports will be added later.</p></div>
 </section>
 
+
 <section class="page" id="files">
-  <h1>Medical vault</h1>
-  <p class="subtitle">A secure place for medical documents.</p>
-  <div class="card"><p class="empty">Private document storage will be configured in a later stage.</p></div>
+  <h1>Medical Vault ♡</h1>
+  <p class="subtitle">Your private medical document storage.</p>
+
+  <div class="card section-card">
+    <h3>Upload Medical Documents</h3>
+
+    <label for="medicalDocType">Document type</label>
+    <select id="medicalDocType">
+      <option value="Medical Certificate">Medical Certificate</option>
+      <option value="Prescription">Prescription</option>
+      <option value="Blood Report">Blood Report</option>
+      <option value="Scan Report">Scan Report</option>
+      <option value="Doctor Notes">Doctor Notes</option>
+      <option value="Other">Other</option>
+    </select>
+
+    <br><br>
+    <label for="medicalDocDate">Document date</label>
+    <input type="date" id="medicalDocDate">
+
+    <br><br>
+    <label for="medicalFile">Choose document</label>
+    <input type="file" id="medicalFile"
+      accept=".pdf,.jpg,.jpeg,.png,.webp">
+
+    <br>
+    <button class="btn" type="button" id="uploadMedicalFile">
+      + Upload Document
+    </button>
+
+    <p id="medicalVaultMessage"></p>
+  </div>
+
+  <div class="card section-card">
+    <h3>Saved Documents</h3>
+    <div id="medicalVaultList">
+      <p class="empty">Your uploaded documents will appear here.</p>
+    </div>
+  </div>
 </section>
+
 
 <section class="page" id="settings">
   <h1>Settings ⚙</h1>
