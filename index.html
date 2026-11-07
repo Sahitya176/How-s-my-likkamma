@@ -573,6 +573,91 @@ document.getElementById('date').textContent =
   });
 
 restoreTheme();
+  // HEALTH RECORD STORAGE — TEST DATA ONLY
+
+const healthKey = 'howsmy_health_records';
+
+function getHealthRecords() {
+  return JSON.parse(localStorage.getItem(healthKey) || '[]');
+}
+
+function setDefaultDateTime() {
+  const now = new Date();
+
+  const date = [
+    now.getFullYear(),
+    String(now.getMonth() + 1).padStart(2, '0'),
+    String(now.getDate()).padStart(2, '0')
+  ].join('-');
+
+  document.getElementById('recordDate').value = date;
+
+  document.getElementById('recordTime').value =
+    now.toTimeString().slice(0, 5);
+}
+
+function displayHealthRecords() {
+  const records = getHealthRecords();
+  const history = document.getElementById('healthHistory');
+
+  if (records.length === 0) {
+    history.innerHTML =
+      '<p class="empty">No records saved yet.</p>';
+    return;
+  }
+
+  history.innerHTML = '';
+
+  records.sort((a, b) =>
+    (b.date + b.time).localeCompare(a.date + a.time)
+  );
+
+  records.forEach(record => {
+    const item = document.createElement('div');
+    item.className = 'insight';
+
+    const heading = document.createElement('strong');
+    heading.textContent = record.date + ' • ' + record.time;
+
+    const details = document.createElement('p');
+    details.textContent =
+      'Heart rate: ' + (record.heartRate || 'Not entered') +
+      ' BPM | Symptom: ' + (record.symptoms || 'Not entered') +
+      ' | Pain location: ' + (record.painLocation || 'Not entered') +
+      ' | Notes: ' + (record.notes || 'None');
+
+    item.append(heading, details);
+    history.appendChild(item);
+  });
+}
+
+document.getElementById('healthForm').addEventListener('submit', function(event) {
+  event.preventDefault();
+
+  const record = {
+    id: Date.now().toString() + Math.random().toString(36).slice(2),
+    date: document.getElementById('recordDate').value,
+    time: document.getElementById('recordTime').value,
+    heartRate: document.getElementById('heartRate').value,
+    symptoms: document.getElementById('symptoms').value,
+    painLocation: document.getElementById('painLocation').value,
+    notes: document.getElementById('notes').value
+  };
+
+  const records = getHealthRecords();
+  records.push(record);
+
+  localStorage.setItem(healthKey, JSON.stringify(records));
+
+  this.reset();
+  setDefaultDateTime();
+  displayHealthRecords();
+
+  alert('Health record saved successfully!');
+});
+
+setDefaultDateTime();
+displayHealthRecords();
 </script>
 </body>
 </html>
