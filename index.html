@@ -863,11 +863,46 @@ h1 {
   </div>
 </section>
 
+
 <section class="page" id="reports">
-  <h1>Monthly reports</h1>
+  <h1>Monthly Reports ♡</h1>
   <p class="subtitle">Your health history at a glance.</p>
-  <div class="card"><p class="empty">Monthly and six-month reports will be added later.</p></div>
+
+  <div class="card section-card">
+    <h3>Select report month</h3>
+    <input type="month" id="reportMonth">
+
+    <button class="btn" type="button" id="generateReport">
+      Generate Report
+    </button>
+    <p id="reportMessage"></p>
+  </div>
+
+  <div id="monthlyReportResults">
+
+    <div class="card section-card">
+      <h3>Medical Summary</h3>
+      <div id="reportMedical">No report generated yet.</div>
+    </div>
+
+    <div class="card section-card">
+      <h3>Food Summary</h3>
+      <div id="reportFood">No report generated yet.</div>
+    </div>
+
+    <div class="card section-card">
+      <h3>Water Summary</h3>
+      <div id="reportWater">No report generated yet.</div>
+    </div>
+
+    <div class="card section-card">
+      <h3>Lifestyle Awareness</h3>
+      <div id="reportLifestyle">No report generated yet.</div>
+    </div>
+
+  </div>
 </section>
+
 
 
 <section class="page" id="files">
