@@ -392,10 +392,62 @@ h1 {
 <!-- PLACEHOLDER PAGES -->
 <section class="page" id="medical">
   <h1>Medical ♡</h1>
-  <p class="subtitle">Heart rate, symptoms and medical updates.</p>
+  <p class="subtitle">Your daily health records and updates.</p>
+
   <div class="card section-card">
-    <h3>Medical dashboard</h3>
-    <p class="empty">Daily health logs and symptom tracking will be built in Stage 2.</p>
+    <h3>♡ Daily Health Record</h3>
+    <p class="empty">Record health updates throughout the day.</p>
+
+    <form id="healthForm">
+      <label>Date</label>
+      <input type="date" id="recordDate" required>
+
+      <br><br>
+      <label>Time</label>
+      <input type="time" id="recordTime" required>
+
+      <br><br>
+      <label>Heart rate (BPM)</label>
+      <input type="number" id="heartRate"
+        placeholder="Enter BPM" min="1" max="300">
+
+      <br><br>
+      <label>Symptoms</label>
+      <select id="symptoms">
+        <option value="">Select symptom</option>
+        <option>Chest pain</option>
+        <option>Headache</option>
+        <option>Dizziness</option>
+        <option>Breathing difficulty</option>
+        <option>Fatigue</option>
+        <option>Stomach pain</option>
+        <option>Other</option>
+        <option>None</option>
+      </select>
+
+      <br><br>
+      <label>Pain location</label>
+      <input type="text" id="painLocation"
+        placeholder="Where is the pain?">
+
+      <br><br>
+      <label>Additional notes</label>
+      <textarea id="notes"
+        placeholder="Describe the health update..."
+        rows="4"></textarea>
+
+      <br>
+      <button class="btn" type="submit">
+        + Save health record
+      </button>
+    </form>
+  </div>
+
+  <div class="card section-card">
+    <h3>Health history</h3>
+    <div id="healthHistory">
+      <p class="empty">No records saved yet.</p>
+    </div>
   </div>
 </section>
 
