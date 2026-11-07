@@ -363,6 +363,53 @@ h1 {
  
 
 <body>
+ <!-- LOGIN SCREEN -->
+<div class="auth-screen" id="authScreen">
+  <div class="auth-card">
+
+    <div class="auth-logo">How's My ♡</div>
+    <p class="auth-subtitle">Your personal health space</p>
+
+    <div id="loginForm">
+      <h2>Welcome back!</h2>
+
+      <label>Email address</label>
+      <input type="email" id="loginEmail" placeholder="Enter your email">
+
+      <label>Password</label>
+      <input type="password" id="loginPassword" placeholder="Enter your password">
+
+      <button class="auth-submit" id="loginButton" type="button">
+        Login
+      </button>
+
+      <p class="auth-switch" onclick="showSignup()">
+        Don't have an account? Sign up
+      </p>
+    </div>
+
+    <div id="signupForm" style="display:none;">
+      <h2>Create account</h2>
+
+      <label>Email address</label>
+      <input type="email" id="signupEmail" placeholder="Enter your email">
+
+      <label>Password</label>
+      <input type="password" id="signupPassword" placeholder="Create a password">
+
+      <button class="auth-submit" id="signupButton" type="button">
+        Sign up
+      </button>
+
+      <p class="auth-switch" onclick="showLogin()">
+        Already have an account? Login
+      </p>
+    </div>
+
+    <p id="authMessage" role="status"></p>
+
+  </div>
+</div>
 <div class="app">
 
 <!-- DESKTOP SIDEBAR -->
