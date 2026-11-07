@@ -2664,9 +2664,30 @@ document.getElementById('saveProfile').addEventListener('click', async () => {
       updated_at: new Date().toISOString()
     });
 
-  message.textContent = error
-    ? 'Could not save profile: ' + error.message
-    : 'Profile saved successfully!';
+    if (error) {
+    message.textContent = 'Could not save profile: ' + error.message;
+    return;
+  }
+
+  document.getElementById('dashboardDisplayName').textContent = name;
+
+  const photo = document.getElementById('dashboardProfilePhoto');
+
+  if (avatarPath) {
+    const { data: imageData, error: imageError } =
+      await supabaseClient.storage
+        .from('profile-photos')
+        .createSignedUrl(avatarPath, 3600);
+
+    if (!imageError && imageData?.signedUrl) {
+      photo.src = imageData.signedUrl;
+      photo.style.display = 'block';
+    }
+  } else {
+    photo.style.display = 'none';
+  }
+
+  message.textContent = 'Profile saved successfully!';
 });
 
 loadProfile();
