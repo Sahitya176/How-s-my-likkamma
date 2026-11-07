@@ -946,38 +946,30 @@ h1 {
     </div>
   </div>
 
+
 <section class="page" id="settings">
-  <div class="card section-card">
-  <h3>Profile Information</h3>
-
-  <label>Display Name</label>
-  <input
-    type="text"
-    id="profileDisplayName"
-    value="Likkamma"
-    placeholder="Enter display name"
-  >
-
-  <label>Profile Photo</label>
-  <input
-    type="file"
-    id="profilePhoto"
-    accept="image/*"
-  >
-
-  <button class="btn" type="button" id="saveProfile">
-    Save Profile
-  </button>
-
-  <p id="profileMessage"></p>
-</div>
   <h1>Settings ⚙</h1>
   <p class="subtitle">Customize your How's My experience.</p>
 
   <div class="card section-card">
+    <h3>Profile Information</h3>
+
+    <label>Display Name</label>
+    <input type="text" id="profileDisplayName"
+      value="Likkamma" placeholder="Enter display name">
+
+    <label>Profile Photo</label>
+    <input type="file" id="profilePhoto" accept="image/*">
+
+    <button class="btn" type="button" id="saveProfile">
+      Save Profile
+    </button>
+    <p id="profileMessage"></p>
+  </div>
+
+  <div class="card section-card">
     <h3>Choose your theme</h3>
     <p class="empty">Select a colour to change your website appearance.</p>
-
     <div class="theme-options">
       <button class="swatch" style="background:#e8a8bd" onclick="theme('#e8a8bd','#fff0f5')" aria-label="Pink"></button>
       <button class="swatch" style="background:#9eb9ed" onclick="theme('#9eb9ed','#eff4ff')" aria-label="Blue"></button>
@@ -985,7 +977,6 @@ h1 {
       <button class="swatch" style="background:#9fcbb4" onclick="theme('#9fcbb4','#eff9f2')" aria-label="Green"></button>
       <button class="swatch" style="background:#e8b779" onclick="theme('#e8b779','#fff6e9')" aria-label="Orange"></button>
     </div>
-
     <label>Choose any custom colour</label>
     <input type="color" class="color-picker" id="customColor" value="#e8a8bd">
     <button class="btn" type="button" onclick="customTheme()">Apply colour</button>
@@ -999,9 +990,7 @@ h1 {
 
   <div class="card section-card">
     <h3>Security</h3>
-    <button class="btn" type="button" id="changePassword">
-      Change Password
-    </button>
+    <button class="btn" type="button" id="changePassword">Change Password</button>
     <p id="passwordMessage"></p>
   </div>
 
@@ -1013,13 +1002,11 @@ h1 {
 
   <div class="card section-card">
     <h3>Account</h3>
-    <button class="btn" type="button" id="settingsLogout">
-      Log Out
-    </button>
+    <button class="btn" type="button" id="settingsLogout">Log Out</button>
     <p id="logoutMessage"></p>
   </div>
-
 </section>
+
 
 
 </main>
