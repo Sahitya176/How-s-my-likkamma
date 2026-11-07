@@ -1675,6 +1675,168 @@ document.getElementById('refreshInsights')
 
 refreshHealthInsights();
 
+// LIFESTYLE AWARENESS TRACKER
+
+let editingLifestyleId = null;
+
+async function loadLifestyleRecords() {
+  const { data: { user } } = await supabaseClient.auth.getUser();
+
+  if (!user) return;
+
+  const { data, error } = await supabaseClient
+    .from('lifestyle_awareness')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    alert('Could not load lifestyle records: ' + error.message);
+    return;
+  }
+
+  const smoking = document.getElementById('smokingHistory');
+  const drinking = document.getElementById('drinkingHistory');
+
+  smoking.innerHTML = '';
+  drinking.innerHTML = '';
+
+  if (!data || data.length === 0) {
+    smoking.textContent = 'No records yet.';
+    drinking.textContent = 'No records yet.';
+    return;
+  }
+
+  data.forEach(record => {
+    const item = document.createElement('div');
+    item.className = 'card section-card';
+
+    const heading = document.createElement('h3');
+    heading.textContent = record.record_type;
+
+    const date = document.createElement('p');
+    date.textContent = new Date(record.created_at).toLocaleString();
+
+    const awareness = document.createElement('p');
+    awareness.textContent =
+      'Awareness: ' + (record.awareness_notes || 'None');
+
+    const notes = document.createElement('p');
+    notes.textContent =
+      'Notes: ' + (record.additional_notes || 'None');
+
+    const editButton = document.createElement('button');
+    editButton.className = 'btn';
+    editButton.textContent = 'Edit';
+
+    editButton.addEventListener('click', () => {
+      editingLifestyleId = record.id;
+
+      document.getElementById('lifestyleType').value =
+        record.record_type;
+
+      document.getElementById('lifestyleQuantity').value =
+        record.awareness_notes || '';
+
+      document.getElementById('lifestyleNotes').value =
+        record.additional_notes || '';
+
+      document.getElementById('saveLifestyle').textContent =
+        'Update record';
+
+      document.getElementById('lifestyle').scrollIntoView({
+        behavior: 'smooth'
+      });
+    });
+
+    const deleteButton = document.createElement('button');
+    deleteButton.className = 'btn';
+    deleteButton.textContent = 'Delete';
+
+    deleteButton.addEventListener('click', async () => {
+      if (!confirm('Delete this record?')) return;
+
+      const { error } = await supabaseClient
+        .from('lifestyle_awareness')
+        .delete()
+        .eq('id', record.id)
+        .eq('owner_id', user.id);
+
+      if (error) {
+        alert('Delete failed: ' + error.message);
+        return;
+      }
+
+      await loadLifestyleRecords();
+    });
+
+    item.append(
+      heading, date, awareness, notes,
+      editButton, deleteButton
+    );
+
+    if (record.record_type === 'Smoking') {
+      smoking.appendChild(item);
+    } else {
+      drinking.appendChild(item);
+    }
+  });
+}
+
+document.getElementById('saveLifestyle')
+  .addEventListener('click', async () => {
+
+    const { data: { user } } = await supabaseClient.auth.getUser();
+
+    if (!user) {
+      alert('Please log in first.');
+      return;
+    }
+
+    const record = {
+      owner_id: user.id,
+      record_type: document.getElementById('lifestyleType').value,
+      awareness_notes: document.getElementById('lifestyleQuantity').value.trim(),
+      additional_notes: document.getElementById('lifestyleNotes').value.trim()
+    };
+
+    const button = document.getElementById('saveLifestyle');
+    button.disabled = true;
+
+    let result;
+
+    if (editingLifestyleId) {
+      result = await supabaseClient
+        .from('lifestyle_awareness')
+        .update(record)
+        .eq('id', editingLifestyleId)
+        .eq('owner_id', user.id);
+    } else {
+      result = await supabaseClient
+        .from('lifestyle_awareness')
+        .insert([record]);
+    }
+
+    button.disabled = false;
+
+    if (result.error) {
+      alert('Could not save record: ' + result.error.message);
+      return;
+    }
+
+    editingLifestyleId = null;
+
+    document.getElementById('lifestyleQuantity').value = '';
+    document.getElementById('lifestyleNotes').value = '';
+
+    button.textContent = '+ Save record';
+    document.getElementById('lifestyleMessage').textContent =
+      'Record saved successfully!';
+
+    await loadLifestyleRecords();
+  });
+
+loadLifestyleRecords();
+
 </script>
 </body>
 </html>
