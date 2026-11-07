@@ -1550,6 +1550,93 @@ document.getElementById('saveMeal').addEventListener('click', async () => {
 setDefaultMealDateTime();
 loadFoodEntries();
 
+// HEALTH INSIGHTS
+
+async function refreshHealthInsights() {
+  const overview = document.getElementById('insightOverview');
+  const heart = document.getElementById('heartRateInsights');
+  const symptoms = document.getElementById('symptomInsights');
+  const activities = document.getElementById('activityInsights');
+  const food = document.getElementById('foodInsights');
+
+  overview.textContent = 'Loading...';
+
+  const { data: { user }, error: userError } =
+    await supabaseClient.auth.getUser();
+
+  if (userError || !user) {
+    overview.textContent = 'Please log in to view insights.';
+    return;
+  }
+
+  const [healthResult, foodResult] = await Promise.all([
+    supabaseClient
+      .from('health_records')
+      .select('*')
+      .order('record_date', { ascending: false }),
+
+    supabaseClient
+      .from('food_entries')
+      .select('*')
+      .order('meal_date', { ascending: false })
+  ]);
+
+  if (healthResult.error) {
+    overview.textContent = 'Could not load health records.';
+    return;
+  }
+
+  const records = healthResult.data || [];
+  const meals = foodResult.data || [];
+
+  overview.textContent =
+    `Total health records: ${records.length}`;
+
+  const heartRates = records
+    .map(r => Number(r.heart_rate))
+    .filter(n => Number.isFinite(n) && n > 0);
+
+  if (heartRates.length) {
+    const average = heartRates.reduce((a, b) => a + b, 0)
+      / heartRates.length;
+
+    heart.textContent =
+      `Recorded measurements: ${heartRates.length}. ` +
+      `Average recorded heart rate: ${average.toFixed(1)} bpm.`;
+  } else {
+    heart.textContent = 'No heart-rate measurements recorded yet.';
+  }
+
+  const symptomRecords = records.filter(
+    r => r.symptoms && r.symptoms.trim()
+  );
+
+  symptoms.textContent = symptomRecords.length
+    ? `${symptomRecords.length} health records contain symptom notes.`
+    : 'No symptom notes recorded yet.';
+
+  const activityRecords = records.filter(
+    r => r.daily_activities && r.daily_activities.trim()
+  );
+
+  activities.textContent = activityRecords.length
+    ? `${activityRecords.length} records contain daily activity details.`
+    : 'No daily activities recorded yet.';
+
+  if (foodResult.error) {
+    food.textContent = 'Food records are currently unavailable.';
+  } else {
+    food.textContent = meals.length
+      ? `${meals.length} meals recorded.`
+      : 'No meals recorded yet.';
+  }
+}
+
+document.getElementById('refreshInsights')
+  .addEventListener('click', refreshHealthInsights);
+
+refreshHealthInsights();
+
 </script>
 </body>
 </html>
