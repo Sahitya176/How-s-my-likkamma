@@ -2641,11 +2641,17 @@ document.getElementById('saveProfile').addEventListener('click', async () => {
     if (!imageError && imageData?.signedUrl) {
       photo.src = imageData.signedUrl;
       photo.style.display = 'block';
+      const preview = document.getElementById('settingsProfilePreview');
+      preview.src = imageData.signedUrl;
+      preview.style.display = 'block';
     }
   } else {
-    photo.style.display = 'none';
-  }
+  photo.style.display = 'none';
 
+  const preview = document.getElementById('settingsProfilePreview');
+  preview.style.display = 'none';
+  preview.removeAttribute('src');
+}
   message.textContent = 'Profile saved successfully!';
 });
 
