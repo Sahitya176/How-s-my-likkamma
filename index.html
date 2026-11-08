@@ -1324,6 +1324,7 @@ function showAuth() {
 }
 
 // SIGN UP
+
 document.getElementById('signupButton').addEventListener('click', async function() {
   const email = document.getElementById('signupEmail').value.trim();
   const password = document.getElementById('signupPassword').value;
@@ -1342,7 +1343,10 @@ document.getElementById('signupButton').addEventListener('click', async function
 
   const { data, error } = await supabaseClient.auth.signUp({
     email: email,
-    password: password
+    password: password,
+    options: {
+      emailRedirectTo: 'https://sahitya176.github.io/How-s-my-likkamma/'
+    }
   });
 
   if (error) {
@@ -1358,6 +1362,7 @@ document.getElementById('signupButton').addEventListener('click', async function
     showLogin();
   }
 });
+
 
 // LOGIN
 document.getElementById('loginButton').addEventListener('click', async function() {
